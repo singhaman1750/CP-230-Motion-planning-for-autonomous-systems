@@ -169,13 +169,13 @@ num_obs, num_coord = obstacles.shape
 # REWARD
 reward = np.full((grid_row,grid_col),-1)
 reward[initial_state[0],initial_state[1]] = -1
-reward[final_state[0],final_state[1]] = 100
+reward[final_state[0],final_state[1]] = 10
 # reward[final_state[0],final_state[1]+1] = 20
 # reward[final_state[0]+1,final_state[1]] = 20
 # reward[final_state[0]+1,final_state[1]+1] = 20
 
 for i in range (num_obs):
-  reward[obstacles[i,0],obstacles[i,1]] = -200
+  reward[obstacles[i,0],obstacles[i,1]] = -10
 
 #print("grid:")
 #print(grid)
@@ -202,7 +202,7 @@ for i in range(grid_row):
 
 # DISCOUNT and UNCERTAINITY
 discount = 0.9
-uncertainity = 0.1
+uncertainity = 0.2
 
 # Number of iterations
 iter_n = 0
@@ -224,7 +224,7 @@ while stop_loop != 1:
   # print(policy_stable)
   # print(iter_n)
   # print(diff_utility)
-  if (policy_stable == 1 or iter_n > 100 or  diff_utility < epsilon):
+  if (policy_stable == 1 or iter_n > 500 or  diff_utility < epsilon):
     stop_loop = 1
   iter_n += 1
 
@@ -273,12 +273,12 @@ for i in range(grid_row):
       path_grid[i,j] = 500
     # elif (((i >= obstacles[0,0]) and (i <= obstacles[num_obs,0])) and ((j >= obstacles[0,1]) and (j <= obstacles[num_obs,1]))):
     elif ((i in obstacles[:,0]) and (j in obstacles[:,1])):
-      print()
       path_grid[i,j] = -100
 
 i = initial_state[0]
 j = initial_state[1]
-while (i != final_state[0] or j != final_state[1]):
+num_steps_in_path = 0
+while ((num_steps_in_path < NUM_STATES + 1) and (i != final_state[0] or j != final_state[1])):
   path_grid[i,j] = 100
   if (updated_policy[i,j] == 0):
     i = i-1
@@ -288,6 +288,11 @@ while (i != final_state[0] or j != final_state[1]):
     i = i+1
   elif (updated_policy[i,j] == 3):
     j = j-1
+  num_steps_in_path = num_steps_in_path + 1
+
+if (num_steps_in_path > NUM_STATES):
+  path_not_found == 1
+  print("PATH NOT FOUND")
 
 path_grid[initial_state[0],initial_state[1]] = 200
 
